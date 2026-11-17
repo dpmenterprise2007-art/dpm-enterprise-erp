@@ -59,6 +59,19 @@ export default function NewInvoicePage() {
     finally { setBusy(false); }
   }
 
+  async function openPdf() {
+    if (!result) return;
+    setBusy(true); setError("");
+    try {
+      const response = await fetch(`${API}/api/v1/invoices/${result.id}/pdf`, { headers: { Authorization: `Bearer ${token()}` } });
+      if (!response.ok) throw new Error("Could not generate invoice PDF");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e) { setError(e instanceof Error ? e.message : "PDF request failed"); }
+    finally { setBusy(false); }
+  }
+
   return <main className="invoice-page">
     <header><Link href="/">← Dashboard</Link><span>DPM ENTERPRISE ERP</span></header>
     <section className="invoice-wrap">
@@ -77,7 +90,7 @@ export default function NewInvoicePage() {
         <button className="submit" disabled={busy || !!result || !customers.length}>{busy ? "Processing..." : "Save invoice draft"}</button>
       </form>
       {error && <div className="error">{error}</div>}
-      {result && <div className="result"><h2>{result.status === "issued" ? "Invoice issued" : "Draft saved"}</h2><p>Invoice ID: {result.id}</p><p>Number: {result.invoice_number || "Assigned when issued"}</p><p>Taxable: ₹{result.taxable_total} · CGST: ₹{result.cgst_total} · SGST: ₹{result.sgst_total} · IGST: ₹{result.igst_total}</p><strong>Grand total: ₹{result.grand_total}</strong>{result.status === "draft" ? <button className="submit" onClick={issueInvoice} disabled={busy}>{busy ? "Processing..." : "Issue invoice & assign number"}</button> : <a className="pdf" href={`${API}/api/v1/invoices/${result.id}/pdf`} target="_blank" rel="noreferrer">Open invoice PDF ↗</a>}</div>}
+      {result && <div className="result"><h2>{result.status === "issued" ? "Invoice issued" : "Draft saved"}</h2><p>Invoice ID: {result.id}</p><p>Number: {result.invoice_number || "Assigned when issued"}</p><p>Taxable: ₹{result.taxable_total} · CGST: ₹{result.cgst_total} · SGST: ₹{result.sgst_total} · IGST: ₹{result.igst_total}</p><strong>Grand total: ₹{result.grand_total}</strong>{result.status === "draft" ? <button className="submit" onClick={issueInvoice} disabled={busy}>{busy ? "Processing..." : "Issue invoice & assign number"}</button> : <button className="submit" onClick={openPdf} disabled={busy}>{busy ? "Preparing PDF..." : "Open invoice PDF"}</button>}</div>}
       <p className="warning">Development screen only. Confirm DPM GST registration state, customer place of supply, HSN/SAC and applicable tax rate before issuing. Accounting journal integration and statutory invoice configuration are still pending.</p>
     </section>
     <style jsx>{`
