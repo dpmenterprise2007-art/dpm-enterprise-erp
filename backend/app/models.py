@@ -2,9 +2,9 @@ import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from sqlalchemy import Boolean, DateTime, Numeric, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 
@@ -104,7 +104,7 @@ class InvoiceLine(Base):
     __tablename__ = "invoice_lines"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    invoice_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
+    invoice_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("invoices.id", ondelete="CASCADE"), nullable=False, index=True)
     item_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     description: Mapped[str] = mapped_column(String(240), nullable=False)
     hsn_sac: Mapped[str | None] = mapped_column(String(8))
@@ -117,4 +117,4 @@ class InvoiceLine(Base):
     cgst_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
     sgst_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
     igst_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
-    line_total: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
+    line_total: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)\n    invoice: Mapped["Invoice"] = relationship(back_populates="lines")
