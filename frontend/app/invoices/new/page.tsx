@@ -5,13 +5,17 @@ import Link from "next/link";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-type Customer = { id: string; display_name: string; gstin: string | null; state_code: string | null };\ntype InvoiceResult = {
+type Customer = { id: string; display_name: string; gstin: string | null; state_code: string | null };
+type InvoiceResult = {
   id: string; invoice_number: string | null; status: string; grand_total: string;
   taxable_total: string; cgst_total: string; sgst_total: string; igst_total: string;
 };
 
 export default function NewInvoicePage() {
-  const [customerId, setCustomerId] = useState("");\n  const [customers, setCustomers] = useState<Customer[]>([]);\n  const token = () => typeof window !== "undefined" ? localStorage.getItem("dpm_erp_token") || "" : "";\n  useEffect(() => { const t=token(); if(!t){ location.href="/login"; return; } fetch(`${API}/api/v1/customers`, {headers:{Authorization:`Bearer ${t}`}}).then(async r=>{if(r.status===401){location.href="/login";return;} if(r.ok){const d=await r.json();setCustomers(d);if(d[0]){setCustomerId(d[0].id);setSupplyState(d[0].state_code||"27");}}}).catch(()=>setError("Could not load customers")); }, []);
+  const [customerId, setCustomerId] = useState("");
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const token = () => typeof window !== "undefined" ? localStorage.getItem("dpm_erp_token") || "" : "";
+  useEffect(() => { const t=token(); if(!t){ location.href="/login"; return; } fetch(`${API}/api/v1/customers`, {headers:{Authorization:`Bearer ${t}`}}).then(async r=>{if(r.status===401){location.href="/login";return;} if(r.ok){const d=await r.json();setCustomers(d);if(d[0]){setCustomerId(d[0].id);setSupplyState(d[0].state_code||"27");}}}).catch(()=>setError("Could not load customers")); }, []);
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10));
   const [companyState, setCompanyState] = useState("27");
   const [supplyState, setSupplyState] = useState("27");
