@@ -85,3 +85,67 @@ class ItemRead(ItemInput):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class InvoiceLineInput(BaseModel):
+    item_id: uuid.UUID | None = None
+    description: str = Field(min_length=1, max_length=240)
+    hsn_sac: str | None = Field(default=None, max_length=8)
+    unit: str = Field(default="NOS", max_length=20)
+    quantity: Decimal = Field(gt=0, max_digits=18, decimal_places=3)
+    rate: Decimal = Field(ge=0, max_digits=18, decimal_places=2)
+    discount_amount: Decimal = Field(default=Decimal("0.00"), ge=0, max_digits=18, decimal_places=2)
+    gst_rate: Decimal = Field(default=Decimal("0.00"), ge=0, le=100, max_digits=5, decimal_places=2)
+
+
+class InvoiceCreate(BaseModel):
+    customer_id: uuid.UUID
+    invoice_date: datetime
+    place_of_supply: str = Field(pattern=r"^[0-9]{2}$")
+    company_state_code: str = Field(pattern=r"^[0-9]{2}$")
+    notes: str | None = None
+    lines: list[InvoiceLineInput] = Field(min_length=1, max_length=100)
+
+
+class InvoiceLineRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    item_id: uuid.UUID | None
+    description: str
+    hsn_sac: str | None
+    unit: str
+    quantity: Decimal
+    rate: Decimal
+    discount_amount: Decimal
+    taxable_value: Decimal
+    gst_rate: Decimal
+    cgst_amount: Decimal
+    sgst_amount: Decimal
+    igst_amount: Decimal
+    line_total: Decimal
+
+
+class InvoiceRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    invoice_number: str | None
+    status: str
+    invoice_date: datetime
+    financial_year: str
+    customer_id: uuid.UUID
+    customer_name: str
+    customer_gstin: str | None
+    customer_address: str | None
+    place_of_supply: str
+    company_state_code: str
+    subtotal: Decimal
+    discount_total: Decimal
+    taxable_total: Decimal
+    cgst_total: Decimal
+    sgst_total: Decimal
+    igst_total: Decimal
+    grand_total: Decimal
+    notes: str | None
+    created_at: datetime
+    posted_at: datetime | None
+    lines: list[InvoiceLineRead]
