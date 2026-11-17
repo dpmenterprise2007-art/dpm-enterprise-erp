@@ -6,6 +6,7 @@ import Link from "next/link";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 type Customer = { id: string; display_name: string; gstin: string | null; state_code: string | null };
+type Item = { id: string; name: string; hsn_sac: string | null; unit: string; sale_rate: string; gst_rate: string };
 type InvoiceResult = {
   id: string; invoice_number: string | null; status: string; grand_total: string;
   taxable_total: string; cgst_total: string; sgst_total: string; igst_total: string;
@@ -14,6 +15,9 @@ type InvoiceResult = {
 export default function NewInvoicePage() {
   const [customerId, setCustomerId] = useState("");
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
+  const [itemId, setItemId] = useState("");
+  const [unit, setUnit] = useState("NOS");
   const token = () => typeof window !== "undefined" ? localStorage.getItem("dpm_erp_token") || "" : "";
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10));
   const [companyState, setCompanyState] = useState("27");
@@ -26,7 +30,9 @@ export default function NewInvoicePage() {
   const [result, setResult] = useState<InvoiceResult | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  useEffect(() => { const t=token(); if(!t){ location.href="/login"; return; } fetch(`${API}/api/v1/customers`, {headers:{Authorization:`Bearer ${t}`}}).then(async r=>{if(r.status===401){location.href="/login";return;} if(r.ok){const d=await r.json();setCustomers(d);if(d[0]){setCustomerId(d[0].id);setSupplyState(d[0].state_code||"27");}}}).catch(()=>setError("Could not load customers")); }, []);
+  useEffect(() => { const t=token(); if(!t){ location.href="/login"; return; } Promise.all([fetch(`${API}/api/v1/customers`, {headers:{Authorization:`Bearer ${t}`}}),fetch(`${API}/api/v1/items`, {headers:{Authorization:`Bearer ${t}`}})]).then(async ([r,ir])=>{if(r.status===401||ir.status===401){location.href="/login";return;}if(r.ok){const d=await r.json();setCustomers(d);if(d[0]){setCustomerId(d[0].id);setSupplyState(d[0].state_code||"27");}}if(ir.ok)setItems(await ir.json());}).catch(()=>setError("Could not load customer and item masters")); }, []);
+
+  function chooseItem(id: string) { setItemId(id); const item=items.find(x=>x.id===id); if(item){setDescription(item.name);setHsn(item.hsn_sac||"");setUnit(item.unit);setRate(item.sale_rate);setGst(item.gst_rate);} }
 
   async function createDraft(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError(""); setResult(null);
@@ -37,7 +43,7 @@ export default function NewInvoicePage() {
           customer_id: customerId,
           invoice_date: new Date(invoiceDate + "T12:00:00+05:30").toISOString(),
           place_of_supply: supplyState, company_state_code: companyState,
-          lines: [{ description, hsn_sac: hsn || null, quantity, rate, gst_rate: gst, unit: "NOS" }]
+          lines: [{ item_id: itemId || null, description, hsn_sac: hsn || null, quantity, rate, gst_rate: gst, unit }]
         })
       });
       const data = await response.json();
@@ -83,6 +89,7 @@ export default function NewInvoicePage() {
           <label>Company GST state code<input required maxLength={2} pattern="[0-9]{2}" value={companyState} onChange={e=>setCompanyState(e.target.value)} placeholder="Set from DPM GST registration"/></label>
         </div>
         <div className="form-card"><h2>Invoice item</h2>
+          <label>Choose item from master (optional)<select value={itemId} onChange={e=>chooseItem(e.target.value)}><option value="">Enter item manually</option>{items.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
           <label>Description<input required maxLength={240} value={description} onChange={e=>setDescription(e.target.value)} placeholder="Interior design / furniture / service description"/></label>
           <div className="three"><label>HSN / SAC<input maxLength={8} value={hsn} onChange={e=>setHsn(e.target.value)} placeholder="HSN/SAC"/></label><label>Quantity<input required type="number" min="0.001" step="0.001" value={quantity} onChange={e=>setQuantity(e.target.value)}/></label><label>Rate (₹)<input required type="number" min="0" step="0.01" value={rate} onChange={e=>setRate(e.target.value)}/></label></div>
           <label>GST rate (%)<select value={gst} onChange={e=>setGst(e.target.value)}><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></label>
