@@ -98,6 +98,7 @@ class Invoice(Base):
     notes: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    lines: Mapped[list["InvoiceLine"]] = relationship(back_populates="invoice", cascade="all, delete-orphan", order_by="InvoiceLine.id")
 
 
 class InvoiceLine(Base):
