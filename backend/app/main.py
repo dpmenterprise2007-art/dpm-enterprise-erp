@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers.masters import router as masters_router\nfrom app.routers.invoices import router as invoices_router
+from app.routers.masters import router as masters_router
+from app.routers.invoices import router as invoices_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -18,7 +19,8 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
-app.include_router(masters_router)\napp.include_router(invoices_router)
+app.include_router(masters_router)
+app.include_router(invoices_router)
 
 
 @app.get("/health", tags=["System"])
@@ -28,4 +30,4 @@ def health() -> dict[str, str]:
 
 @app.get("/api/v1", tags=["System"])
 def api_root() -> dict[str, str]:
-    return {"name": "DPM ENTERPRISE ERP", "version": "1.0.0", "stage": "master-data"}
+    return {"name": "DPM ENTERPRISE ERP", "version": "1.0.0", "stage": "invoice-engine"}
