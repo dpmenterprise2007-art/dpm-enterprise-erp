@@ -14,10 +14,11 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, selectinload
 
 from app.db import get_db
+from app.security import get_current_user
 from app.models import Customer, Invoice, InvoiceLine, InvoiceSequence, Item
 from app.schemas import InvoiceCreate, InvoiceRead
 
-router = APIRouter(prefix="/api/v1", tags=["Sales Invoices"])
+router = APIRouter(prefix="/api/v1", tags=["Sales Invoices"], dependencies=[Depends(get_current_user)])
 CENT = Decimal("0.01")
 ZERO = Decimal("0.00")
 
