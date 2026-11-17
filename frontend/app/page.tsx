@@ -19,7 +19,7 @@ export default function Home() {
       <div className="brand"><div className="mark">D</div><div><b>DPM <span>ENTERPRISE</span></b><small>BUSINESS SUITE</small></div></div>
       <div className="label">WORKSPACE</div><div className="company">▦ <span>DPM Enterprise Pvt. Ltd.</span>⌄</div>
       <div className="label menu-label">MENU</div>
-      <nav>{links.map(([name, Icon], i) => <a className={i===0?"nav active":"nav"} href="#" key={name}><Icon size={18}/>{name}</a>)}</nav>
+      <nav>{links.map(([name, Icon], i) => <a className={i===0?"nav active":"nav"} href={name === "Sales & Invoices" ? "/invoices/new" : "#"} key={name}><Icon size={18}/>{name}</a>)}</nav>
       <div className="side-bottom"><a className="nav" href="#"><Settings size={18}/>Settings</a><div className="user"><div className="avatar">DP</div><div><b>DPM Administrator</b><small>Administrator</small></div></div></div>
     </aside>
     <section className="main">
