@@ -6,10 +6,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.security import get_current_user
 from app.models import Customer, Item, Vendor
 from app.schemas import CustomerInput, CustomerRead, ItemInput, ItemRead, VendorInput, VendorRead
 
-router = APIRouter(prefix="/api/v1", tags=["Master Data"])
+router = APIRouter(prefix="/api/v1", tags=["Master Data"], dependencies=[Depends(get_current_user)])
 
 
 def commit_or_conflict(db: Session) -> None:
