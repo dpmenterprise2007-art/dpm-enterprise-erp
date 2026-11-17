@@ -20,7 +20,7 @@ export default function Home() {
       <div className="label">WORKSPACE</div><div className="company">▦ <span>DPM Enterprise Pvt. Ltd.</span>⌄</div>
       <div className="label menu-label">MENU</div>
       <nav>{links.map(([name, Icon], i) => <a className={i===0?"nav active":"nav"} href={name === "Sales & Invoices" ? "/invoices/new" : name === "Parties" ? "/customers" : name === "Purchase" ? "/suppliers" : "#"} key={name}><Icon size={18}/>{name}</a>)}</nav>
-      <div className="side-bottom"><a className="nav" href="#"><Settings size={18}/>Settings</a><div className="user"><div className="avatar">DP</div><div><b>DPM Administrator</b><small>Administrator</small></div></div></div>
+      <div className="side-bottom"><a className="nav" href="/settings/users"><Settings size={18}/>User access</a><div className="user"><div className="avatar">DP</div><div><b>DPM Administrator</b><small>Administrator</small></div></div></div>
     </aside>
     <section className="main">
       <header className="top"><div className="crumb">Workspace <span>/</span> <b>Overview</b></div><div className="tools"><a href="/login" style={{fontSize:"11px",color:"#315fc6",textDecoration:"none"}}>Sign in</a><div className="search"><Search size={16}/> Search anything...</div><Bell size={18}/><div className="avatar">DP</div></div></header>
