@@ -1,7 +1,7 @@
 # Authentication and Local Setup
 
 ## 1. Configure environment
-Copy `.env.example` to `.env`. Set a unique, randomly generated JWT_SECRET_KEY (at least 32 random bytes) and a strong database password. Do not commit `.env`.
+From the `backend` directory, copy `../.env.example` to `backend/.env` (the settings loader reads the backend-local `.env`). Set a unique, randomly generated JWT_SECRET_KEY (at least 32 random bytes) and a strong database password. Keep the database password consistent with the PostgreSQL service. Do not commit `.env`.
 
 ## 2. Start PostgreSQL
 From the repository root:
