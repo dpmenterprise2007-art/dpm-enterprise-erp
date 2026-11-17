@@ -117,4 +117,5 @@ class InvoiceLine(Base):
     cgst_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
     sgst_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
     igst_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
-    line_total: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)\n    invoice: Mapped["Invoice"] = relationship(back_populates="lines")
+    line_total: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
+    invoice: Mapped["Invoice"] = relationship(back_populates="lines")
