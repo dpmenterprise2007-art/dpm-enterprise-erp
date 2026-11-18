@@ -18,7 +18,7 @@ def test_lead_score_rewards_complete_high_value_enquiry() -> None:
     assert calculate_lead_score(lead) == 90
 
 
-def test_lead_score_caps_at_100_and_handles_sparse_lead() -> None:
+def test_lead_score_handles_sparse_and_complete_leads() -> None:
     sparse = Lead(contact_name="Walk-in", estimated_value=Decimal("0"))
     assert calculate_lead_score(sparse) == 10
 
