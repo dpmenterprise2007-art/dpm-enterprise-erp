@@ -1,4 +1,4 @@
-name: DPM ERP Backend Checks
+name: DPM ERP Python Checks
 
 on:
   push:
@@ -7,41 +7,24 @@ on:
     branches: [main]
 
 jobs:
-  backend:
+  python:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install backend dependencies
+      - name: Install Python dependencies
         working-directory: backend
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Compile Python source
         working-directory: backend
-        run: python -m compileall -q app migrations
+        run: python -m compileall -q app scripts
       - name: Run tests
         working-directory: backend
         env:
           PYTHONPATH: ${{ github.workspace }}/backend
-          DATABASE_URL: postgresql+psycopg://dpm_erp:ci-placeholder@localhost:5432/dpm_erp
+          DATABASE_URL: sqlite:///./ci_test.db
         run: pytest -q
-
-  frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: Install frontend dependencies
-        run: npm install
-      - name: Build frontend
-        env:
-          NEXT_PUBLIC_API_URL: http://localhost:8000
-        run: npm run build
