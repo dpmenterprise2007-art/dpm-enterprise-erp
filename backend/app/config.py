@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "CHANGE-ME-BEFORE-DEPLOYMENT-USE-32-PLUS-RANDOM-BYTES"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
+    bootstrap_admin_name: str = "DPM Enterprise Administrator"
+    bootstrap_admin_email: str = ""
+    bootstrap_admin_password: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
