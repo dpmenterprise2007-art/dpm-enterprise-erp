@@ -115,7 +115,7 @@ def invoice_detail(invoice_id:UUID,request:Request,db:Session=Depends(get_db)):
     u=auth(request,db);x=db.scalar(select(Invoice).options(selectinload(Invoice.lines)).where(Invoice.id==invoice_id))
     if not x: raise HTTPException(404,"Invoice not found")
     lines=[(escape(y.description),str(y.quantity),f"₹{y.rate:,.2f}",f"₹{y.taxable_value:,.2f}",f"₹{y.line_total:,.2f}") for y in x.lines]
-    action=f'<form method="post" action="/invoices/{x.id}/issue"><button>Issue invoice</button></form>' if x.status=="draft" else f'<a class="button" href="/api/v1/invoices/{x.id}/pdf" target="_blank">Open PDF</a>'
+    action=f'<form method="post" action="/invoices/{x.id}/issue"><button>Issue invoice</button></form>' if x.status=="draft" else f'<a class="button" href="/invoices/{x.id}/pdf" target="_blank">Open PDF</a>'
     return shell("Invoice detail",f'<section class="card"><p>{escape(x.status)} · {escape(x.invoice_number or "Draft")}</p><p>Customer: {escape(x.customer_name)}</p>{table(["Description","Qty","Rate","Taxable","Total"],lines)}<h2>Grand total ₹{x.grand_total:,.2f}</h2>{action}</section>',u)
 
 @router.post("/invoices/{invoice_id}/issue")
