@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     database_url: str = "sqlite:///./dpm_erp.db"
     cors_origins: str = "http://localhost:3000"
-    public_base_url: str = "https://www.dpmenterprise.in"
+    public_base_url: str = "https://dpm-enterprise-erp-preview.onrender.com"
     jwt_secret_key: str = "CHANGE-ME-BEFORE-DEPLOYMENT-USE-32-PLUS-RANDOM-BYTES"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
