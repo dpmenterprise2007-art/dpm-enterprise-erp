@@ -176,3 +176,43 @@ class UserCreate(BaseModel):
     full_name: str = Field(min_length=1, max_length=160)
     password: str = Field(min_length=12, max_length=256)
     role: Literal["admin", "staff"] = "staff"
+
+
+class LeadCreate(BaseModel):
+    contact_name: str = Field(min_length=1, max_length=160)
+    company_name: str | None = Field(default=None, max_length=180)
+    phone: str | None = Field(default=None, max_length=20)
+    email: EmailStr | None = None
+    source: str = Field(default="manual", min_length=1, max_length=60)
+    requirement: str | None = None
+    estimated_value: Decimal = Field(default=Decimal("0.00"), ge=0)
+    follow_up_at: datetime | None = None
+
+
+class LeadUpdate(BaseModel):
+    contact_name: str | None = Field(default=None, min_length=1, max_length=160)
+    company_name: str | None = Field(default=None, max_length=180)
+    phone: str | None = Field(default=None, max_length=20)
+    email: EmailStr | None = None
+    source: str | None = Field(default=None, min_length=1, max_length=60)
+    requirement: str | None = None
+    estimated_value: Decimal | None = Field(default=None, ge=0)
+    status: Literal["new", "contacted", "qualified", "proposal", "won", "lost"] | None = None
+    follow_up_at: datetime | None = None
+
+
+class LeadRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: uuid.UUID
+    contact_name: str
+    company_name: str | None
+    phone: str | None
+    email: EmailStr | None
+    source: str
+    requirement: str | None
+    estimated_value: Decimal
+    status: str
+    follow_up_at: datetime | None
+    score: int
+    created_at: datetime
+    updated_at: datetime
