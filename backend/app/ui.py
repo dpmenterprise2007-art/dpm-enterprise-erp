@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.config import settings
 from app.db import get_db
 from app.models import Customer, Invoice, Item, User, Vendor
-from app.routers.invoices import create_invoice, issue_invoice
+from app.routers.invoices import create_invoice, issue_invoice, invoice_pdf
 from app.schemas import InvoiceCreate, InvoiceLineInput
 from app.security import hash_password, verify_password, create_access_token
 
@@ -138,3 +138,8 @@ def user_add(request:Request,full_name:Annotated[str,Form()],email:Annotated[str
     if len(password)<12: raise HTTPException(422,"Password must be at least 12 characters")
     db.add(User(full_name=full_name.strip(),email=email.strip().lower(),password_hash=hash_password(password),role=role if role in {"admin","staff"} else "staff"));db.commit()
     return RedirectResponse("/users",303)
+
+@router.get("/invoices/{invoice_id}/pdf")
+def invoice_pdf_ui(invoice_id: UUID, request: Request, db: Session = Depends(get_db)):
+    auth(request, db)
+    return invoice_pdf(invoice_id, db)
