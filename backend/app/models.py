@@ -132,3 +132,21 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+
+class Lead(Base):
+    __tablename__ = "leads"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    contact_name: Mapped[str] = mapped_column(String(160), nullable=False, index=True)
+    company_name: Mapped[str | None] = mapped_column(String(180), index=True)
+    phone: Mapped[str | None] = mapped_column(String(20), index=True)
+    email: Mapped[str | None] = mapped_column(String(254), index=True)
+    source: Mapped[str] = mapped_column(String(60), nullable=False, default="manual")
+    requirement: Mapped[str | None] = mapped_column(Text)
+    estimated_value: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False, default=Decimal("0.00"))
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default="new", index=True)
+    follow_up_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+    score: Mapped[int] = mapped_column(nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
