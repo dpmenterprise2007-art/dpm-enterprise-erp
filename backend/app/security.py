@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
+from uuid import UUID
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -50,7 +51,7 @@ def get_current_user(
             raise credentials_error
     except jwt.PyJWTError as exc:
         raise credentials_error from exc
-    user = db.get(User, user_id)
+    user = db.get(User, UUID(user_id))
     if not user or not user.is_active:
         raise credentials_error
     return user
