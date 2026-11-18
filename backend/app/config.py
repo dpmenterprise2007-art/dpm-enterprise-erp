@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "DPM ENTERPRISE ERP"
     app_env: str = "development"
-    database_url: str = "postgresql+psycopg://dpm_erp:change-this-local-password@localhost:5432/dpm_erp"
+    database_url: str = "sqlite:///./dpm_erp.db"
     cors_origins: str = "http://localhost:3000"
     jwt_secret_key: str = "CHANGE-ME-BEFORE-DEPLOYMENT-USE-32-PLUS-RANDOM-BYTES"
     jwt_algorithm: str = "HS256"
