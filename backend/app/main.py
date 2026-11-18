@@ -13,6 +13,7 @@ from app.security import hash_password
 from app.routers.auth import router as auth_router
 from app.routers.invoices import router as invoices_router
 from app.routers.masters import router as masters_router
+from app.routers.leads import router as leads_router
 from app.ui import router as ui_router
 
 
@@ -56,6 +57,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.include_router(ui_router)
 app.include_router(auth_router)
 app.include_router(masters_router)
+app.include_router(leads_router)
 app.include_router(invoices_router)
 
 
