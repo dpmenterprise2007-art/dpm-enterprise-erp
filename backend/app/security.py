@@ -49,7 +49,7 @@ def get_current_user(
         user_id = payload.get("sub")
         if not user_id:
             raise credentials_error
-    except jwt.PyJWTError as exc:
+    except (jwt.PyJWTError, ValueError, TypeError) as exc:
         raise credentials_error from exc
     user = db.get(User, UUID(user_id))
     if not user or not user.is_active:
