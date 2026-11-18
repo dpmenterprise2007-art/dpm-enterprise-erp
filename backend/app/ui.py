@@ -51,7 +51,7 @@ def login(email:Annotated[str,Form()],password:Annotated[str,Form()],db:Session=
     user=db.scalar(select(User).where(User.email==email.strip().lower()))
     if not user or not user.is_active or not verify_password(password,user.password_hash):
         return shell("Sign in",'<form class="card narrow" method="post"><p class="error">Email or password incorrect.</p>'+inp("Email","email","email",True)+inp("Password","password","password",True)+'<button>Sign in</button></form>')
-    r=RedirectResponse("/",303);r.set_cookie("dpm_session",create_access_token(user),httponly=True,samesite="lax",secure=False,max_age=settings.access_token_expire_minutes*60);return r
+    r=RedirectResponse("/",303);r.set_cookie("dpm_session",create_access_token(user),httponly=True,samesite="lax",secure=settings.app_env.lower() == "production",max_age=settings.access_token_expire_minutes*60);return r
 
 @router.get("/logout")
 def logout():
