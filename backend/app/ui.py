@@ -27,7 +27,8 @@ def shell(title,body,user=None):
 def auth(request,db):
     try:
         data=jwt.decode(request.cookies.get("dpm_session",""),settings.jwt_secret_key,algorithms=[settings.jwt_algorithm])
-        user=db.get(User,data.get("sub"))
+        user_id = UUID(data.get("sub", ""))
+        user=db.get(User,user_id)
     except (jwt.PyJWTError,ValueError,TypeError):
         user=None
     if not user or not user.is_active: raise HTTPException(303,headers={"Location":"/login"})
