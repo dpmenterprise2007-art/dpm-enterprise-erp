@@ -40,7 +40,8 @@ def table(headers,rows):
     return '<table><tr>'+''.join(f'<th>{h}</th>' for h in headers)+'</tr>'+''.join('<tr>'+''.join(f'<td>{v}</td>' for v in row)+'</tr>' for row in rows)+'</table>'
 
 @router.get("/login",response_class=HTMLResponse)
-def login_page():
+def login_page(db:Session=Depends(get_db)):
+    if (db.scalar(select(func.count()).select_from(User)) or 0)==0: return RedirectResponse("/setup",303)
     form='<form class="card narrow" method="post"><h2>Sign in</h2>'+inp("Email","email","email",True)+inp("Password","password","password",True)+'<button>Sign in</button></form>'
     return shell("Sign in",form)
 
@@ -143,3 +144,24 @@ def user_add(request:Request,full_name:Annotated[str,Form()],email:Annotated[str
 def invoice_pdf_ui(invoice_id: UUID, request: Request, db: Session = Depends(get_db)):
     auth(request, db)
     return invoice_pdf(invoice_id, db)
+
+@router.get("/setup", response_class=HTMLResponse)
+def first_admin_setup(db: Session = Depends(get_db)):
+    if (db.scalar(select(func.count()).select_from(User)) or 0)>0:
+        return RedirectResponse("/login",303)
+    form='<form class="card narrow" method="post"><h2>First-time administrator setup</h2><p class="muted">Create the first DPM ERP administrator account.</p>'+inp("Full name","full_name","text",True)+inp("Email","email","email",True)+inp("Password (minimum 12 characters)","password","password",True)+'<button>Create administrator</button></form>'
+    return shell("Initial setup",form)
+
+@router.post("/setup")
+def first_admin_create(full_name: Annotated[str,Form()], email: Annotated[str,Form()], password: Annotated[str,Form()], db: Session = Depends(get_db)):
+    if (db.scalar(select(func.count()).select_from(User)) or 0)>0:
+        return RedirectResponse("/login",303)
+    if len(password)<12:
+        raise HTTPException(422,"Password must be at least 12 characters")
+    db.add(User(full_name=full_name.strip(),email=email.strip().lower(),password_hash=hash_password(password),role="admin"))
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(409,"Could not create administrator; check whether this email already exists")
+    return RedirectResponse("/login",303)
